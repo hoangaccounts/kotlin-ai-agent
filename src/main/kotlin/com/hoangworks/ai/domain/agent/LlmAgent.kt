@@ -8,10 +8,11 @@ import com.hoangworks.ai.domain.tool.Tool
 class LlmAgent( private val llmClient : LlmClient,
     private val tools : List<Tool>) : Agent {
 
-    private val toolRegistry = tools.associateBy { it.name }
+    private val toolRegistry = tools.associateBy { it.definition.name }
 
     override suspend fun run(goal: String): AgentResult {
-        return when (val result = llmClient.generate(goal)) {
+        return when (val result = llmClient.generate(goal,
+        tools = toolRegistry.values.map { it.definition})) {
             is LlmResult.Success ->
                 Success(result.content)
 
